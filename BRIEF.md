@@ -96,14 +96,18 @@ Prompty do Stitch: `attachments/TRASOGRAF-STITCH-PROMPTS.md`
 
 - [x] Zebranie wymagan
 - [x] Ustalenie scope MVP i cennika
-- [ ] Setup projektu Next.js
-- [ ] Landing page + trasa Krakowa (SVG)
-- [ ] Konfigurator z live preview (Stitch API)
-- [ ] Integracja Stripe
-- [ ] Formularz zamowienia
-- [ ] Webhook i obsługa zamowien
-- [ ] Testy end-to-end
-- [ ] Deploy na Vercel
+- [x] Setup projektu Next.js 16 + shadcn/ui + Tailwind
+- [x] Landing page z estetyka editorial + SVG trasy Krakowa
+- [x] Konfigurator z live preview (Stitch API)
+- [x] Integracja Stripe (Checkout, BLIK/P24, webhook)
+- [x] Formularz zamowienia z adresem dostawy
+- [x] Webhook logujacy zamowienia (Stripe Dashboard jako panel)
+- [x] Deploy na Vercel: https://trasograf.vercel.app
+- [x] GitHub: https://github.com/kszincel/trasograf
+- [ ] Podpiecie kluczy Stripe (STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET)
+- [ ] Weryfikacja integracji Stitch API (endpoint + format response)
+- [ ] Testy platnosci (Stripe test mode)
+- [ ] Podpiecie wlasnej domeny
 
 ---
 
