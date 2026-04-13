@@ -11,31 +11,28 @@ export function Nav({ dark = false }: NavProps) {
   const pathname = usePathname();
 
   const linkClass = (href: string, disabled = false) => {
-    const base = "text-xs tracking-widest uppercase transition-colors";
+    const base = "text-xs tracking-widest uppercase transition-colors font-medium";
     const active = pathname === href;
     if (disabled)
-      return `${base} ${dark ? "text-white/30" : "text-foreground/30"} cursor-default`;
+      return `${base} text-white/25 cursor-default`;
     if (active)
-      return `${base} ${dark ? "text-white" : "text-foreground"} font-medium`;
-    return `${base} ${dark ? "text-white/60 hover:text-white" : "text-muted-foreground hover:text-foreground"}`;
+      return `${base} text-white`;
+    return `${base} text-white/55 hover:text-white`;
   };
 
   return (
-    <nav
-      className={`flex items-center justify-between px-6 md:px-10 py-5 ${
-        dark ? "border-b border-white/10" : "border-b border-border"
-      }`}
-    >
+    <nav className="flex items-center justify-between px-6 md:px-10 py-5 border-b border-white/10">
       <Link
         href="/"
-        className={`text-base tracking-[0.2em] uppercase font-bold ${
-          dark ? "text-white" : "text-foreground"
-        }`}
+        className="text-sm tracking-[0.25em] uppercase font-black text-white"
         style={{ fontFamily: "var(--font-inter)" }}
       >
         Trasograf
       </Link>
-      <div className="flex items-center gap-6 md:gap-8">
+      <div className="hidden md:flex items-center gap-7">
+        <Link href="/" className={linkClass("/")}>
+          Strona
+        </Link>
         <Link href="/krakow-2026" className={linkClass("/krakow-2026")}>
           Eventy
         </Link>
@@ -49,6 +46,13 @@ export function Nav({ dark = false }: NavProps) {
           O nas
         </span>
       </div>
+      <Link
+        href="/krakow-2026"
+        className="text-xs tracking-widest uppercase font-bold px-5 py-2.5 transition-opacity hover:opacity-85"
+        style={{ backgroundColor: "var(--color-amber)", color: "var(--color-coal)", fontFamily: "var(--font-inter)" }}
+      >
+        Zamów
+      </Link>
     </nav>
   );
 }

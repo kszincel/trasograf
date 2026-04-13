@@ -87,11 +87,29 @@
 
 /* Utility: dark hero sections */
 .section-dark {
-  background-color: oklch(0.18 0.01 260);
+  background-color: var(--color-coal);
   color: oklch(0.97 0.006 80);
 }
 
 .section-graphite {
-  background-color: oklch(0.25 0.015 255);
+  background-color: var(--color-graphite);
+  color: oklch(0.97 0.006 80);
+}
+
+.section-cream {
+  background-color: var(--color-cream);
+  color: var(--color-coal);
+}
+
+/* Poster mockup frame */
+.poster-frame {
+  background: var(--color-cream);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Subtle noise overlay for dark sections */
+.section-dark-texture {
+  background-color: var(--color-coal);
+  background-image: radial-gradient(ellipse at 70% 40%, oklch(0.22 0.02 255 / 0.6) 0%, transparent 65%);
   color: oklch(0.97 0.006 80);
 }
