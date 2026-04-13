@@ -33,7 +33,7 @@ export function Nav({ dark = false }: NavProps) {
         <Link href="/" className={linkClass("/")}>
           Strona
         </Link>
-        <Link href="/krakow-2026" className={linkClass("/krakow-2026")}>
+        <Link href="/oshee-nocny-2026" className={linkClass("/oshee-nocny-2026")}>
           Eventy
         </Link>
         <Link href="/konfigurator" className={linkClass("/konfigurator")}>
