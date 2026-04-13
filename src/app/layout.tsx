@@ -1,32 +1,35 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono-brand",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
-  title: "Trasograf — plakat z Twojego maratonu",
+  title: "Trasograf — Spersonalizowane plakaty z tras sportowych",
   description:
-    "Zamien swoj maraton w premium plakat. Wlasna trasa GPS, Twoje dane, estetyka editorial. Druk i dostawa do domu.",
+    "Zamień swój maraton, szlak lub trasę rowerową w premium plakat. Wybierz styl, wpisz dane — i od razu zobacz jak będzie wyglądał. Drukowany i dostarczony w 2 tygodnie.",
   openGraph: {
-    title: "Trasograf — plakat z Twojego maratonu",
+    title: "Trasograf — Twoja trasa. Na ścianie.",
     description:
-      "Premium plakaty z tras sportowych GPS. Konfigurator z podgladem na zywo.",
+      "Spersonalizowane plakaty z tras sportowych — maratony, szlaki, trasy rowerowe.",
     type: "website",
+    locale: "pl_PL",
   },
 };
 
@@ -38,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="pl"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
+      className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

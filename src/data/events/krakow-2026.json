@@ -1,0 +1,21 @@
+{
+  "id": "krakow-2026",
+  "name": "23. maraton w Krakowie",
+  "date": "19.04.2026",
+  "city": "Kraków",
+  "distance": "42,195 km",
+  "participants": 9000,
+  "slug": "krakow-2026",
+  "description": "23. maraton w Krakowie — przez Rynek Główny, Wawel, Bulwary Wiślane, Przegorzały i 9 dzielnic.",
+  "keyPoints": ["Rynek Główny", "Wawel", "Bulwary Wiślane", "Przegorzały", "Tyniec"],
+  "preorderDiscount": 25,
+  "deliveryDates": {
+    "bazowy": "03.05.2026",
+    "premium": "03.05.2026",
+    "kolekcjonerski": "10.05.2026"
+  },
+  "route": {
+    "viewBox": "0 0 400 560",
+    "path": "M 185 52 C 195 50 210 50 225 54 L 248 62 C 265 70 278 80 285 95 L 292 115 C 297 130 295 145 288 158 L 278 172 C 268 185 262 196 265 210 L 270 228 C 274 242 275 254 270 266 L 260 282 C 250 295 242 305 240 318 L 238 335 C 236 348 238 360 244 370 L 252 384 C 258 395 260 406 254 416 L 242 430 C 232 442 228 452 232 462 L 238 474 C 243 483 240 490 231 490 L 215 488 C 202 485 192 479 186 468 L 178 453 C 172 440 168 430 172 418 L 178 404 C 184 390 184 378 178 368 L 168 352 C 158 338 152 325 154 310 L 158 294 C 163 278 162 264 155 252 L 144 236 C 135 220 132 205 138 190 L 148 174 C 158 158 162 144 158 128 L 150 110 C 144 94 144 78 155 66 L 170 57 Z"
+  }
+}

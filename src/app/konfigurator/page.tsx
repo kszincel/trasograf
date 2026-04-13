@@ -1,333 +1,245 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { RouteShape } from "@/components/RouteShape";
-import { Badge } from "@/components/ui/badge";
+import { Nav } from "@/components/Nav";
+import { PosterSVG, type PosterTemplate, type PosterData } from "@/components/poster/PosterSVG";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { KRAKOW_ROUTE } from "@/lib/krakow-route";
 import { PRICE_VARIANTS, formatPrice, type PriceVariant } from "@/lib/stripe";
-import type { PosterTemplate } from "@/lib/stitch";
-
-type Step = "szablon" | "dane" | "wariant";
-
-interface FormData {
-  template: PosterTemplate;
-  name: string;
-  time: string;
-  date: string;
-  startNumber: string;
-}
+import eventData from "@/data/events/krakow-2026.json";
 
 const TEMPLATES: { id: PosterTemplate; label: string; opis: string }[] = [
   { id: "czysty", label: "Czysty", opis: "Minimalistyczny, Swiss design" },
-  { id: "editorial", label: "Editorial", opis: "Kremowy, Kinfolk vibe" },
-  { id: "topograficzny", label: "Topograficzny", opis: "Vintage kartograficzny" },
+  { id: "editorial", label: "Editorial", opis: "Kremowy, magazynowy" },
+  { id: "topograficzny", label: "Topograficzny", opis: "Vintage kartografia" },
 ];
 
 export default function KonfiguratorPage() {
-  const [step, setStep] = useState<Step>("szablon");
-  const [form, setForm] = useState<FormData>({
-    template: "editorial",
-    name: "",
-    time: "",
-    date: KRAKOW_ROUTE.event.date,
-    startNumber: "",
+  const [template, setTemplate] = useState<PosterTemplate>("editorial");
+  const [form, setForm] = useState({
+    imie: "",
+    czas: "",
+    data: eventData.date,
+    bib_number: "",
+    dedication: "",
   });
-  const [selectedVariant, setSelectedVariant] = useState<PriceVariant>(PRICE_VARIANTS[1]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [loadingPreview, setLoadingPreview] = useState(false);
-  const [previewError, setPreviewError] = useState(false);
+  const [variant, setVariant] = useState<PriceVariant>(PRICE_VARIANTS[1]);
+  const [loading, setLoading] = useState(false);
 
-  const isFormComplete =
-    form.name.trim() !== "" &&
-    form.time.trim() !== "" &&
-    form.date.trim() !== "" &&
-    form.startNumber.trim() !== "";
+  const set = (field: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const generatePreview = useCallback(async () => {
-    if (!isFormComplete) return;
-    setLoadingPreview(true);
-    setPreviewError(false);
-    try {
-      const res = await fetch("/api/stitch/preview", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, watermark: true }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        setPreviewUrl(data.url);
-      } else {
-        setPreviewError(true);
-      }
-    } catch {
-      setPreviewError(true);
-    } finally {
-      setLoadingPreview(false);
-    }
-  }, [form, isFormComplete]);
+  const posterData: PosterData = {
+    template,
+    imie: form.imie || "Twoje imię",
+    czas: form.czas || "0:00:00",
+    data: form.data,
+    bib_number: form.bib_number || undefined,
+    dedication: form.dedication || undefined,
+    watermark: true,
+  };
+
+  const isComplete = form.imie.trim() !== "" && form.czas.trim() !== "";
 
   const goToOrder = () => {
+    if (!isComplete) return;
     const params = new URLSearchParams({
-      template: form.template,
-      name: form.name,
-      time: form.time,
-      date: form.date,
-      startNumber: form.startNumber,
-      priceId: selectedVariant.id,
+      template,
+      imie: form.imie,
+      czas: form.czas,
+      data: form.data,
+      bib_number: form.bib_number,
+      dedication: form.dedication,
+      priceId: variant.id,
     });
     window.location.href = `/zamowienie?${params.toString()}`;
   };
 
   return (
     <main className="min-h-screen flex flex-col">
-      {/* Nawigacja */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <Link
-          href="/"
-          className="text-lg tracking-widest uppercase font-light"
-          style={{ fontFamily: "var(--font-playfair)" }}
-        >
-          Trasograf
-        </Link>
-        <div className="flex items-center gap-6 text-xs tracking-wider uppercase text-muted-foreground">
-          {(["szablon", "dane", "wariant"] as Step[]).map((s, i) => (
-            <span
-              key={s}
-              className={step === s ? "text-foreground" : ""}
-            >
-              {i + 1}. {s}
-            </span>
-          ))}
-        </div>
-      </nav>
+      <Nav />
 
-      <div className="flex flex-1 flex-col md:flex-row">
-        {/* Lewa — podglad */}
-        <aside className="w-full md:w-[420px] bg-secondary/30 border-r border-border flex flex-col items-center justify-center p-8 min-h-[400px]">
-          <div className="w-full max-w-[280px] aspect-[5/7] border border-border bg-background relative flex items-center justify-center overflow-hidden">
-            {previewUrl ? (
-              <Image
-                src={previewUrl}
-                alt="Podglad plakatu"
-                fill
-                className="object-contain"
-              />
-            ) : (
-              <div className="flex flex-col items-center gap-4 px-6 text-center">
-                {loadingPreview ? (
-                  <>
-                    <div className="w-8 h-8 border-2 border-foreground/20 border-t-foreground rounded-full animate-spin" />
-                    <p className="text-xs text-muted-foreground">Generuje podglad...</p>
-                  </>
-                ) : (
-                  <>
-                    <RouteShape
-                      size="full"
-                      className="max-w-[120px] max-h-[160px] text-foreground/60"
-                      strokeWidth={1.2}
-                    />
-                    {isFormComplete ? (
-                      <button
-                        onClick={generatePreview}
-                        className="text-xs tracking-wider uppercase underline underline-offset-4 hover:text-muted-foreground transition-colors"
-                      >
-                        Generuj podglad
-                      </button>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        Wypelnij dane, aby zobaczyc podglad
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-            {/* Watermark overlay — zawsze widoczny na podgladzie */}
-            <div
-              className="absolute inset-0 pointer-events-none select-none flex items-center justify-center"
-              style={{ opacity: 0.07 }}
-            >
-              <span
-                className="text-3xl font-bold rotate-[-35deg] tracking-widest"
-                style={{ fontFamily: "var(--font-playfair)" }}
-              >
-                TRASOGRAF
-              </span>
-            </div>
+      <div className="flex flex-1 flex-col lg:flex-row">
+        {/* Lewy panel — podgląd SVG */}
+        <aside className="w-full lg:w-[420px] bg-secondary/30 border-r border-border flex flex-col items-center justify-start py-10 px-6 shrink-0">
+          <p className="text-xs tracking-widest uppercase text-muted-foreground mb-6 font-medium">
+            Podgląd plakatu
+          </p>
+
+          {/* SVG Preview */}
+          <div
+            className="w-full max-w-[280px] border border-border shadow-lg bg-white"
+            style={{ aspectRatio: "5/7" }}
+          >
+            <PosterSVG data={posterData} />
           </div>
 
-          {previewUrl && (
-            <button
-              onClick={generatePreview}
-              disabled={loadingPreview}
-              className="mt-4 text-xs tracking-wider uppercase text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors disabled:opacity-50"
-            >
-              Odswiez podglad
-            </button>
-          )}
-          {previewError && (
-            <p className="mt-3 text-xs text-destructive">
-              Blad generowania — sprobuj ponownie
-            </p>
-          )}
+          <p className="text-xs text-muted-foreground text-center mt-4 max-w-[220px]">
+            Podgląd z watermarkiem. Wersja do druku bez watermarku — po
+            płatności.
+          </p>
 
           <div className="mt-6 text-center">
-            <Badge variant="secondary" className="text-xs tracking-wider">
-              {KRAKOW_ROUTE.event.name} · {KRAKOW_ROUTE.event.date}
-            </Badge>
+            <p className="text-xs font-mono text-muted-foreground" style={{ fontFamily: "var(--font-mono)" }}>
+              {eventData.name} · {eventData.date}
+            </p>
           </div>
         </aside>
 
-        {/* Prawa — konfiguracja */}
-        <div className="flex-1 px-6 md:px-12 py-10 max-w-xl">
-          {/* Krok 1: Szablon */}
-          <section className="mb-10">
-            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-6">
-              1. Wybierz szablon
+        {/* Prawy panel — konfiguracja */}
+        <div className="flex-1 px-6 md:px-12 py-10 max-w-2xl">
+          {/* Szablon */}
+          <div className="mb-8">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-4 font-medium">
+              1. Wybierz styl
             </p>
             <div className="grid grid-cols-3 gap-3">
               {TEMPLATES.map((t) => (
                 <button
                   key={t.id}
-                  onClick={() => setForm((f) => ({ ...f, template: t.id }))}
-                  className={`border p-4 text-left transition-colors ${
-                    form.template === t.id
+                  onClick={() => setTemplate(t.id)}
+                  className={`border-2 p-4 text-left transition-all ${
+                    template === t.id
                       ? "border-foreground bg-secondary"
                       : "border-border hover:border-foreground/40"
                   }`}
                 >
-                  <p className="text-xs font-medium tracking-wider uppercase mb-1">
+                  <p className="text-xs font-bold tracking-wider uppercase mb-1">
                     {t.label}
                   </p>
-                  <p className="text-xs text-muted-foreground leading-snug">{t.opis}</p>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    {t.opis}
+                  </p>
                 </button>
               ))}
             </div>
-          </section>
+          </div>
 
-          <Separator className="mb-10" />
+          <Separator className="mb-8" />
 
-          {/* Krok 2: Dane */}
-          <section className="mb-10">
-            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-6">
+          {/* Dane */}
+          <div className="mb-8">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-4 font-medium">
               2. Twoje dane
             </p>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-xs tracking-wider uppercase">
-                  Imie i nazwisko
+                <Label className="text-xs tracking-wider uppercase font-medium">
+                  Imię i nazwisko *
                 </Label>
                 <Input
-                  id="name"
                   placeholder="np. Anna Kowalska"
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  value={form.imie}
+                  onChange={set("imie")}
                   className="mt-1.5"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="time" className="text-xs tracking-wider uppercase">
-                    Czas (GG:MM:SS)
+                  <Label className="text-xs tracking-wider uppercase font-medium">
+                    Czas (GG:MM:SS) *
                   </Label>
                   <Input
-                    id="time"
                     placeholder="np. 4:12:33"
-                    value={form.time}
-                    onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
-                    className="mt-1.5"
+                    value={form.czas}
+                    onChange={set("czas")}
+                    className="mt-1.5 font-mono"
+                    style={{ fontFamily: "var(--font-mono)" }}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="startNumber" className="text-xs tracking-wider uppercase">
+                  <Label className="text-xs tracking-wider uppercase font-medium">
                     Numer startowy
                   </Label>
                   <Input
-                    id="startNumber"
                     placeholder="np. 4821"
-                    value={form.startNumber}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, startNumber: e.target.value }))
-                    }
+                    value={form.bib_number}
+                    onChange={set("bib_number")}
                     className="mt-1.5"
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="date" className="text-xs tracking-wider uppercase">
+                <Label className="text-xs tracking-wider uppercase font-medium">
                   Data biegu
                 </Label>
                 <Input
-                  id="date"
-                  value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+                  value={form.data}
+                  onChange={set("data")}
                   className="mt-1.5"
                 />
               </div>
+              <div>
+                <Label className="text-xs tracking-wider uppercase font-medium">
+                  Dedykacja (opcjonalna)
+                </Label>
+                <Textarea
+                  placeholder="np. Dla Taty — pierwszych 42 km!"
+                  value={form.dedication}
+                  onChange={set("dedication")}
+                  className="mt-1.5 resize-none"
+                  rows={2}
+                />
+              </div>
             </div>
+          </div>
 
-            {isFormComplete && !previewUrl && (
-              <button
-                onClick={generatePreview}
-                disabled={loadingPreview}
-                className="mt-4 text-xs tracking-wider uppercase underline underline-offset-4 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-              >
-                {loadingPreview ? "Generuje..." : "Podglad na zywo"}
-              </button>
-            )}
-          </section>
+          <Separator className="mb-8" />
 
-          <Separator className="mb-10" />
-
-          {/* Krok 3: Wariant */}
-          <section className="mb-10">
-            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-6">
+          {/* Wariant */}
+          <div className="mb-8">
+            <p className="text-xs tracking-widest uppercase text-muted-foreground mb-4 font-medium">
               3. Wybierz wariant
             </p>
             <div className="space-y-2">
               {PRICE_VARIANTS.map((v) => (
                 <button
                   key={v.id}
-                  onClick={() => setSelectedVariant(v)}
-                  className={`w-full border p-4 text-left flex items-center justify-between transition-colors ${
-                    selectedVariant.id === v.id
+                  onClick={() => setVariant(v)}
+                  className={`w-full border-2 p-4 text-left flex items-center justify-between transition-all ${
+                    variant.id === v.id
                       ? "border-foreground bg-secondary"
                       : "border-border hover:border-foreground/40"
                   }`}
                 >
                   <div>
-                    <p className="text-sm font-medium">{v.name}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{v.description}</p>
+                    <p className="text-sm font-bold">{v.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {v.description}
+                    </p>
                   </div>
                   <p
-                    className="text-lg ml-4 shrink-0"
-                    style={{ fontFamily: "var(--font-playfair)" }}
+                    className="text-lg font-black ml-4 shrink-0"
+                    style={{ fontFamily: "var(--font-inter)" }}
                   >
                     {formatPrice(v.price)}
                   </p>
                 </button>
               ))}
             </div>
-          </section>
+          </div>
 
           {/* CTA */}
           <button
             onClick={goToOrder}
-            disabled={!isFormComplete}
-            className="w-full bg-foreground text-background py-4 text-sm tracking-wider uppercase hover:opacity-80 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+            disabled={!isComplete || loading}
+            className="w-full py-4 text-sm font-bold tracking-wider uppercase transition-opacity disabled:opacity-30 disabled:cursor-not-allowed text-[#1A1A2E] hover:opacity-90"
+            style={{ backgroundColor: "var(--color-amber)" }}
           >
-            Przejdz do zamowienia — {formatPrice(selectedVariant.price)}
+            Zamów — {formatPrice(variant.price)} →
           </button>
-          {!isFormComplete && (
+          {!isComplete && (
             <p className="text-xs text-muted-foreground text-center mt-2">
-              Wypelnij wszystkie dane, aby kontynuowac
+              Wpisz imię i czas aby kontynuować
             </p>
           )}
+          <p className="text-xs text-muted-foreground text-center mt-3">
+            Płatność przez Stripe — BLIK, karta, Przelewy24
+          </p>
         </div>
       </div>
     </main>
