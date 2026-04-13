@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Nav } from "@/components/Nav";
-import { PosterSVG, type PosterTemplate, type PosterData } from "@/components/poster/PosterSVG";
+import { PosterMap } from "@/components/poster/PosterMap";
+import { type PosterTemplate, type PosterData } from "@/components/poster/PosterSVG";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -73,9 +74,9 @@ export default function KonfiguratorPage() {
           {/* SVG Preview */}
           <div
             className="w-full max-w-[280px] border border-border shadow-lg bg-white"
-            style={{ aspectRatio: "5/7" }}
+            style={{ aspectRatio: "5/7", position: "relative" }}
           >
-            <PosterSVG data={posterData} />
+            <PosterMap data={posterData} />
           </div>
 
           <p className="text-xs text-muted-foreground text-center mt-4 max-w-[220px]">
