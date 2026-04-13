@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Nav } from "@/components/Nav";
 import { PosterMap } from "@/components/poster/PosterMap";
@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { PRICE_VARIANTS, formatPrice, type PriceVariant } from "@/lib/stripe";
-import eventData from "@/data/events/krakow-2026.json";
+import { CRACOVIA_ROUTE_COORDS } from "@/data/events/krakow-2026-route";
+import { OSHEE_ROUTE_COORDS } from "@/data/events/krakow-oshee-2026-route";
 
 const TEMPLATES: { id: PosterTemplate; label: string; opis: string }[] = [
   { id: "czysty", label: "Czysty", opis: "Minimalistyczny, Swiss design" },
@@ -18,17 +19,46 @@ const TEMPLATES: { id: PosterTemplate; label: string; opis: string }[] = [
   { id: "topograficzny", label: "Topograficzny", opis: "Vintage kartografia" },
 ];
 
+const EVENT_DEFAULTS: Record<string, { date: string; label: string; dystans: string; routeCoords: [number, number][] }> = {
+  oshee: {
+    date: "18.04.2026",
+    label: "OSHEE Nocny Bieg dla WOŚP",
+    dystans: "10",
+    routeCoords: OSHEE_ROUTE_COORDS,
+  },
+  cracovia: {
+    date: "19.04.2026",
+    label: "23. Maraton w Krakowie",
+    dystans: "42",
+    routeCoords: CRACOVIA_ROUTE_COORDS,
+  },
+};
+
 export default function KonfiguratorPage() {
   const [template, setTemplate] = useState<PosterTemplate>("editorial");
+  const [eventKey, setEventKey] = useState<string>("cracovia");
   const [form, setForm] = useState({
     imie: "",
     czas: "",
-    data: eventData.date,
+    data: "19.04.2026",
     bib_number: "",
     dedication: "",
   });
   const [variant, setVariant] = useState<PriceVariant>(PRICE_VARIANTS[1]);
   const [loading, setLoading] = useState(false);
+
+  // Czytaj event z URL po załadowaniu
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ev = params.get("event") ?? "cracovia";
+    const dataParam = params.get("data");
+    const key = EVENT_DEFAULTS[ev] ? ev : "cracovia";
+    setEventKey(key);
+    setForm((f) => ({
+      ...f,
+      data: dataParam || EVENT_DEFAULTS[key].date,
+    }));
+  }, []);
 
   const set = (field: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -71,12 +101,15 @@ export default function KonfiguratorPage() {
             Podgląd plakatu
           </p>
 
-          {/* SVG Preview */}
+          {/* Map Preview */}
           <div
             className="w-full max-w-[280px] border border-border shadow-lg bg-white"
             style={{ aspectRatio: "5/7", position: "relative" }}
           >
-            <PosterMap data={posterData} />
+            <PosterMap
+              data={posterData}
+              routeCoords={EVENT_DEFAULTS[eventKey].routeCoords}
+            />
           </div>
 
           <p className="text-xs text-muted-foreground text-center mt-4 max-w-[220px]">
@@ -86,7 +119,7 @@ export default function KonfiguratorPage() {
 
           <div className="mt-6 text-center">
             <p className="text-xs font-mono text-muted-foreground" style={{ fontFamily: "var(--font-mono)" }}>
-              {eventData.name} · {eventData.date}
+              {EVENT_DEFAULTS[eventKey].label} · {EVENT_DEFAULTS[eventKey].date}
             </p>
           </div>
         </aside>

@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { CRACOVIA_ROUTE_COORDS } from "@/data/events/krakow-2026-route";
 import type { PosterData, PosterTemplate } from "./PosterSVG";
 
+export type { PosterData };
+
 // ── Mapbox Static API ──────────────────────────────────────────────────────
 
 const MAPBOX_STYLES: Record<PosterTemplate, string> = {
@@ -34,7 +36,8 @@ function buildMapboxUrl(
   template: PosterTemplate,
   width: number,
   height: number,
-  token: string
+  token: string,
+  routeCoords: [number, number][]
 ): string {
   const style = MAPBOX_STYLES[template];
 
@@ -45,7 +48,7 @@ function buildMapboxUrl(
         type: "Feature",
         geometry: {
           type: "LineString",
-          coordinates: CRACOVIA_ROUTE_COORDS,
+          coordinates: routeCoords,
         },
         properties: {
           stroke: STROKE_COLORS[template],
@@ -57,7 +60,7 @@ function buildMapboxUrl(
         type: "Feature",
         geometry: {
           type: "Point",
-          coordinates: CRACOVIA_ROUTE_COORDS[0],
+          coordinates: routeCoords[0],
         },
         properties: {
           "marker-color": MARKER_COLORS[template],
@@ -466,15 +469,25 @@ function Fallback({ template }: { template: PosterTemplate }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────
 
-export function PosterMap({ data, width = 500, height = 700 }: { data: PosterData; width?: number; height?: number }) {
+export function PosterMap({
+  data,
+  routeCoords = CRACOVIA_ROUTE_COORDS,
+  width = 500,
+  height = 700,
+}: {
+  data: PosterData;
+  routeCoords?: [number, number][];
+  width?: number;
+  height?: number;
+}) {
   const [imgError, setImgError] = useState(false);
 
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN ?? "";
 
   const mapUrl = useMemo(() => {
     if (!token || imgError) return "";
-    return buildMapboxUrl(data.template, width, height, token);
-  }, [data.template, width, height, token, imgError]);
+    return buildMapboxUrl(data.template, width, height, token, routeCoords);
+  }, [data.template, width, height, token, routeCoords, imgError]);
 
   return (
     <div className="relative overflow-hidden" style={{ width: "100%", height: "100%" }}>

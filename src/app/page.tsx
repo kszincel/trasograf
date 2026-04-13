@@ -97,9 +97,9 @@ export default function HomePage() {
             Nadchodzące eventy
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Krakow 2026 — aktywny */}
+            {/* OSHEE Nocny Bieg — 18 kwietnia */}
             <Link
-              href="/krakow-2026"
+              href="/oshee-nocny-2026"
               className="border-2 p-8 hover:shadow-lg transition-shadow group"
               style={{ borderColor: "var(--color-amber)" }}
             >
@@ -107,6 +107,30 @@ export default function HomePage() {
                 <p
                   className="text-xs tracking-widest uppercase font-bold"
                   style={{ color: "var(--color-amber)" }}
+                >
+                  Pre-order · −25%
+                </p>
+                <span className="text-xs text-muted-foreground">18.04.2026</span>
+              </div>
+              <h3 className="text-xl font-black mb-1 group-hover:underline" style={{ fontFamily: "var(--font-inter)" }}>
+                OSHEE Nocny Bieg dla WOŚP
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Nocna trasa przez centrum Krakowa · 10 km
+              </p>
+              <span className="text-sm font-bold">
+                Od {formatPrice(PRICE_VARIANTS[0].price)} →
+              </span>
+            </Link>
+
+            {/* Cracovia Maraton — 19 kwietnia */}
+            <Link
+              href="/krakow-2026"
+              className="border border-border p-8 hover:shadow-lg transition-shadow group"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <p
+                  className="text-xs tracking-widest uppercase font-bold text-muted-foreground"
                 >
                   Pre-order · −25%
                 </p>
@@ -122,14 +146,6 @@ export default function HomePage() {
                 Od {formatPrice(PRICE_VARIANTS[0].price)} →
               </span>
             </Link>
-
-            {/* Placeholder */}
-            <div className="border border-dashed border-border p-8 flex flex-col justify-center items-center text-center">
-              <p className="text-muted-foreground/50 text-sm mb-2">Wkrótce więcej eventów</p>
-              <p className="text-xs text-muted-foreground/40">
-                Zostaw email — damy Ci znać jako pierwszemu.
-              </p>
-            </div>
           </div>
         </div>
       </section>
